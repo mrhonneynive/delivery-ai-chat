@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aras Kargo - AI Delivery Assistant</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- HTMX CDN -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <!-- Alpine.js CDN -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        .chat-container { height: calc(100vh - 200px); }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-red-600 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold tracking-tight">Aras Kargo AI</h1>
+            <span class="text-sm bg-red-700 px-3 py-1 rounded-full">Phase 2: Production</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto flex-grow p-4 flex flex-col max-w-4xl">
+        <div id="chat-window" class="chat-container overflow-y-auto mb-4 bg-white rounded-2xl shadow-inner p-6 space-y-4 border border-gray-200">
+            <!-- Initial Message -->
+            <div class="flex justify-start">
+                <div class="bg-gray-100 p-4 rounded-2xl rounded-tl-none max-w-xs shadow-sm">
+                    <p class="text-gray-800">Merhaba! Ben Aras Kargo asistanınız. Kargonuza dair her şeyi sorabilirsiniz. 🚀</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="relative" x-data="{ message: '' }">
+            <form hx-post="/chat" 
+                  hx-target="#chat-window" 
+                  hx-swap="beforeend" 
+                  @submit="message = ''; $nextTick(() => { document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight })"
+                  class="flex gap-2">
+                <input type="text" 
+                       name="message" 
+                       x-model="message"
+                       placeholder="Mesajınızı buraya yazın..." 
+                       class="w-full p-4 rounded-2xl shadow-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all font-medium"
+                       required>
+                <button type="submit" 
+                        class="bg-red-600 text-white p-4 rounded-2xl shadow-lg hover:shadow-xl hover:bg-red-700 transition-all active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                </button>
+            </form>
+            
+            <!-- Typing Indicator (HTMX shows this while waiting) -->
+            <div id="typing-indicator" class="htmx-indicator absolute -top-8 left-4 text-sm text-gray-500 italic">
+                Cevap yazılıyor...
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-4 text-center text-gray-400 text-sm">
+        &copy; 2024 Aras Kargo AI Assistant. Tüm hakları saklıdır.
+    </footer>
+
+    <script>
+        // Scroll to bottom after HTMX update
+        document.body.addEventListener('htmx:afterOnLoad', function(evt) {
+            const chatWindow = document.getElementById('chat-window');
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        });
+    </script>
+</body>
+</html>
